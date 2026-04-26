@@ -1,6 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
-import { Modal } from 'bootstrap'
 import './style.css'
 import Swal from 'sweetalert2'
 import { crearCardProducto } from './components/card.js'
@@ -30,6 +29,9 @@ function inicializarApp() {
   configuracionPrincipalEventos()
   produ()
   configurarEventosCarrito()
+  configurarEventosLogin()
+  configurarEventosBusqueda()
+  configurarFormularioContacto()
   actualizarVistaCarrito()
 }
 
@@ -40,6 +42,125 @@ function configurarEventosCarrito() {
 
     const id = Number(btn.getAttribute('data-id'))
     agregarProductoAlCarrito(id)
+  })
+
+  document.addEventListener('click', (e) => {
+    const btnCantidad = e.target.closest('[data-carrito-accion]')
+    if (!btnCantidad) return
+
+    const idProducto = Number(btnCantidad.getAttribute('data-id'))
+    const accion = btnCantidad.getAttribute('data-carrito-accion')
+
+    if (accion === 'sumar') cambiarCantidadProducto(idProducto, 1)
+    if (accion === 'restar') cambiarCantidadProducto(idProducto, -1)
+    if (accion === 'eliminar') eliminarProductoDelCarrito(idProducto)
+  })
+}
+
+function configurarEventosLogin() {
+  const formLogin = document.getElementById('formLogin')
+  if (!formLogin) return
+
+  formLogin.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const correo = formLogin.querySelector('input[type="email"]')?.value.trim()
+    const password = formLogin.querySelector('input[type="password"]')?.value.trim()
+
+    if (!correo || !password) {
+      Swal.fire({
+        title: 'Campos incompletos',
+        text: 'Completa tu correo y contraseña para continuar.',
+        icon: 'warning',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#6F4E37'
+      })
+      return
+    }
+
+    Swal.fire({
+      title: '¡Bienvenido!',
+      text: `Inicio de sesión correcto para ${correo}.`,
+      icon: 'success',
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+      confirmButtonColor: '#6F4E37'
+    }).then(() => {
+      const modal = document.getElementById('modalLogin')
+      if (!modal || !window.bootstrap) return
+      const instancia = bootstrap.Modal.getOrCreateInstance(modal)
+      instancia.hide()
+      formLogin.reset()
+    })
+  })
+}
+
+
+function configurarEventosBusqueda() {
+  const inputBusqueda = document.getElementById('busqueda-input')
+  const botonBusqueda = document.getElementById('btn-buscar')
+  if (!inputBusqueda || !botonBusqueda) return
+
+  botonBusqueda.addEventListener('click', () => {
+    buscarProductos(inputBusqueda.value)
+  })
+
+  inputBusqueda.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    buscarProductos(inputBusqueda.value)
+  })
+
+  inputBusqueda.addEventListener('input', () => {
+    if (inputBusqueda.value.trim() === '') {
+      buscarProductos('')
+    }
+  })
+}
+
+function buscarProductos(terminoBusqueda) {
+  const contenedor = document.getElementById('contenedor-productos')
+  if (!contenedor) return
+
+  const termino = terminoBusqueda.trim().toLowerCase()
+  const resultados = termino
+    ? productos.filter(
+        (producto) =>
+          producto.nombre.toLowerCase().includes(termino) ||
+          producto.categoria.toLowerCase().includes(termino) ||
+          producto.descripcion.toLowerCase().includes(termino)
+      )
+    : productos
+
+  if (resultados.length === 0) {
+    contenedor.innerHTML = `
+      <div class="col-12 text-center">
+        <p class="text-muted mb-0">No encontramos productos con ese criterio.</p>
+      </div>
+    `
+    return
+  }
+
+  contenedor.innerHTML = resultados.map((producto) => crearCardProducto(producto)).join('')
+}
+
+function configurarFormularioContacto() {
+  const formulario = document.getElementById('form-contacto')
+  if (!formulario) return
+
+  formulario.addEventListener('submit', (e) => {
+    e.preventDefault()
+
+    Swal.fire({
+      title: 'registro exitoso',
+      html: '<small>tus datos se enviaron correctamente</small>',
+      icon: 'success',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: '#6F4E37',
+      background: '#F5F5DC'
+    }).then(() => {
+      formulario.reset()
+    })
   })
 }
 
