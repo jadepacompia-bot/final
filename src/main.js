@@ -7,7 +7,9 @@ import { productos } from './data/producto.js'
 import {
   mostrarHero,
   mostrarCatalogo,
+  mostrarFormularioContacto,
   mostrarModalDetalles,
+  buscarProductos,
   configuracionPrincipalEventos,
   renderizarMenuCategorias,
   produ,
@@ -20,6 +22,7 @@ function inicializarApp() {
   document.querySelector('#app').innerHTML = `
     ${mostrarHero()}
     ${mostrarCatalogo()}
+    ${mostrarFormularioContacto()}
     ${mostrarModalDetalles()}
   `
 
@@ -28,7 +31,10 @@ function inicializarApp() {
   configuracionPrincipalEventos()
   produ()
   configurarEventosCarrito()
+  configurarToggleCarrito()
   configurarEventosLogin()
+  configurarEventosBusqueda()
+  configurarFormularioContacto()
   actualizarVistaCarrito()
 }
 
@@ -54,6 +60,26 @@ function configurarEventosCarrito() {
   })
 }
 
+function configurarToggleCarrito() {
+  const botonCarrito = document.getElementById('btn-toggle-carrito')
+  const collapseElement = document.getElementById('carritoCollapse')
+  if (!botonCarrito || !collapseElement || !window.bootstrap) return
+
+  const instancia = bootstrap.Collapse.getOrCreateInstance(collapseElement, { toggle: false })
+
+  botonCarrito.addEventListener('click', () => {
+    instancia.toggle()
+  })
+
+  collapseElement.addEventListener('shown.bs.collapse', () => {
+    botonCarrito.setAttribute('aria-expanded', 'true')
+  })
+
+  collapseElement.addEventListener('hidden.bs.collapse', () => {
+    botonCarrito.setAttribute('aria-expanded', 'false')
+  })
+}
+
 function configurarEventosLogin() {
   const formLogin = document.getElementById('formLogin')
   if (!formLogin) return
@@ -74,18 +100,63 @@ function configurarEventosLogin() {
       return
     }
 
+    const modal = document.getElementById('modalLogin')
+    if (modal && window.bootstrap) {
+      const instancia = bootstrap.Modal.getOrCreateInstance(modal)
+      instancia.hide()
+    }
+    formLogin.reset()
+
     Swal.fire({
       title: '¡Bienvenido!',
       text: `Inicio de sesión correcto para ${correo}.`,
       icon: 'success',
-      confirmButtonText: 'Continuar',
-      confirmButtonColor: '#6F4E37'
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+      background: '#F5F5DC'
+    })
+  })
+}
+
+function configurarEventosBusqueda() {
+  const inputBusqueda = document.getElementById('busqueda-input')
+  const botonBusqueda = document.getElementById('btn-buscar')
+  if (!inputBusqueda || !botonBusqueda) return
+
+  botonBusqueda.addEventListener('click', () => {
+    buscarProductos(inputBusqueda.value)
+  })
+
+  inputBusqueda.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    buscarProductos(inputBusqueda.value)
+  })
+
+  inputBusqueda.addEventListener('input', () => {
+    if (inputBusqueda.value.trim() === '') {
+      buscarProductos('')
+    }
+  })
+}
+
+function configurarFormularioContacto() {
+  const formulario = document.getElementById('form-contacto')
+  if (!formulario) return
+
+  formulario.addEventListener('submit', (e) => {
+    e.preventDefault()
+
+    Swal.fire({
+      title: 'registro exitoso',
+      html: '<small>tus datos se enviaron correctamente</small>',
+      icon: 'success',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: '#6F4E37',
+      background: '#F5F5DC'
     }).then(() => {
-      const modal = document.getElementById('modalLogin')
-      if (!modal || !window.bootstrap) return
-      const instancia = bootstrap.Modal.getOrCreateInstance(modal)
-      instancia.hide()
-      formLogin.reset()
+      formulario.reset()
     })
   })
 }
