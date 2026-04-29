@@ -59,7 +59,7 @@ export function renderizarMenuCategorias() {
     const listaMenu = document.querySelector('#lista-categorias-menu');
     if (!listaMenu) return;
 
-    // Obtenemos categorías únicas de tus datos
+    
     const categorias = ['Todos', ...new Set(productos.map(p => p.categoria))];
     
     listaMenu.innerHTML = categorias.map(cat => `
@@ -72,9 +72,9 @@ export function renderizarMenuCategorias() {
     `).join('');
 }
 
-// Esta función es para que los botones del menú lateral funcionen
+
 export function configuracionPrincipalEventos() {
-    // 1. EVENTO PARA LAS CATEGORÍAS (Baja al catálogo)
+    
     const listaMenu = document.querySelector('#lista-categorias-menu');
     if (listaMenu) {
         listaMenu.addEventListener('click', (e) => {
