@@ -230,7 +230,7 @@ export const productos = [
     id: 25,
     nombre: 'Miel Natural',
     precio: 12.00,
-    medida: 'KG',
+    medida: 'Und',
     imagen: 'https://images.unsplash.com/photo-1587049352851-8d4e89133924?w=300&h=300&fit=crop',
     descripcion: 'Miel pura sin aditivos, producida de manera artesanal.',
     categoria: 'Productos Naturales'
@@ -239,7 +239,7 @@ export const productos = [
     id: 26,
     nombre: 'Aceite de Oliva',
     precio: 15.00,
-    medida: 'KG',
+    medida: 'Und',
     imagen: 'https://i.blogs.es/6df34a/olive-oil-968657_1280-2-/1366_2000.jpg',
     descripcion: 'Aceite de oliva extra virgen, ideal para una alimentación saludable.',
     categoria: 'Productos Naturales'
